@@ -3,15 +3,14 @@ from pathlib import Path
 import html
 
 ROOT = Path(__file__).parent
-ORIGIN = "https://hanssen-engineering.hanssenbudi.chatgpt.site"
+ORIGIN = "https://cubelated.com"
 E = html.escape
 
 CONTENT = {'en': {'lang': 'en',
         'path': '/',
-        'title': 'Hanssen Budisantoso Wijaya',
-        'description': 'Hanssen Budisantoso Wijaya, software engineer in Taiwan with 4+ years of experience '
-                       'in full-stack development, mobile apps, and systems integration. Explore projects '
-                       'and experience.',
+        'title': 'Hanssen Budisantoso Wijaya | Software Engineer in Taiwan',
+        'description': 'Explore Hanssen Budisantoso Wijaya’s portfolio: full-stack platforms, Flutter mobile apps, '
+                       'and systems integration. Software engineer in Taichung, Taiwan.',
         'skip': 'Skip to content',
         'code': 'Source code',
         'visit': 'Visit product',
@@ -96,8 +95,8 @@ CONTENT = {'en': {'lang': 'en',
                      '')]},
  'zh': {'lang': 'zh-Hant',
         'path': '/zh-tw/',
-        'title': 'Hanssen Budisantoso Wijaya',
-        'description': '黃晟旺（Hanssen Budisantoso Wijaya），居住於台中的軟體工程師，具 4 年以上全端開發、行動應用與系統整合經驗。瀏覽精選作品與工作經歷。',
+        'title': '黃晟旺 Hanssen｜台中軟體工程師・全端與 Flutter 開發',
+        'description': '黃晟旺（Hanssen Budisantoso Wijaya）的個人作品集。台中軟體工程師，專注全端開發、Flutter 行動應用與系統整合。探索 Renewables、Selah、IFGF Planner 等專案與工作經歷。',
         'skip': '跳至主要內容',
         'code': '查看原始碼',
         'visit': '前往產品網站',

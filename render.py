@@ -82,10 +82,29 @@ def render(key,c):
     jobs=''.join(f'<li><span class="job-date">{E(date)}</span><strong>{E(role)}</strong><span>{E(company)}</span><p class="job-summary">{E(items[0])}</p></li>' for date,role,company,items in c['jobs'])
     skills=''.join(f'<div><h3>{E(a)}</h3><p>{E(t)}</p></div>' for a,b,t in c['expertise'])
     schools=''.join(f'<p><strong>{E(a)}</strong><br>{E(b)} {E(t)}</p>' for a,b,t in c['degrees'])
-    schema={'@context':'https://schema.org','@type':'Person','name':'Hanssen Budisantoso Wijaya','alternateName':'黃晟旺','jobTitle':'Software Engineer','url':ORIGIN+c['path'],'sameAs':['https://github.com/cubelated','https://www.linkedin.com/in/hanssen-budisantoso-wijaya/']}
+    person_id = ORIGIN + '/#person'
+    website_id = ORIGIN + '/#website'
+    page_url = ORIGIN + c['path']
+    schema = {'@context': 'https://schema.org', '@graph': [
+        {'@type': 'Person', '@id': person_id,
+         'name': 'Hanssen Budisantoso Wijaya', 'alternateName': ['黃晟旺', 'Hanssen Budi'],
+         'jobTitle': 'Software Engineer', 'url': ORIGIN + '/',
+         'homeLocation': {'@type': 'Place', 'name': 'Taichung, Taiwan'},
+         'knowsAbout': ['Full-stack development', 'Flutter', 'Mobile application development', 'Systems integration'],
+         'sameAs': ['https://github.com/cubelated',
+                    'https://www.linkedin.com/in/hanssen-budisantoso-wijaya/',
+                    'https://www.youtube.com/@cubelated']},
+        {'@type': 'WebSite', '@id': website_id, 'url': ORIGIN + '/',
+         'name': 'Cubelated', 'alternateName': 'Hanssen Budisantoso Wijaya',
+         'inLanguage': ['en', 'zh-Hant'], 'publisher': {'@id': person_id}},
+        {'@type': 'ProfilePage', '@id': page_url + '#webpage', 'url': page_url,
+         'name': c['title'], 'description': c['description'], 'inLanguage': c['lang'],
+         'isPartOf': {'@id': website_id}, 'mainEntity': {'@id': person_id}}
+    ]}
     return f'''<!DOCTYPE html>
 <html lang="{c['lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#111111"><title>{E(c['title'])}</title><meta name="description" content="{E(c['description'])}">
 <link rel="canonical" href="{ORIGIN+c['path']}"><link rel="alternate" hreflang="en" href="{ORIGIN}/"><link rel="alternate" hreflang="zh-Hant" href="{ORIGIN}/zh-tw/"><link rel="alternate" hreflang="x-default" href="{ORIGIN}/"><meta property="og:type" content="website"><meta property="og:title" content="{E(c['title'])}"><meta property="og:description" content="{E(c['description'])}"><meta property="og:url" content="{ORIGIN+c['path']}"><meta property="og:locale" content="{'en_US' if isen else 'zh_TW'}">
+<meta property="og:site_name" content="Cubelated"><meta property="og:locale:alternate" content="{'zh_TW' if isen else 'en_US'}"><meta property="og:image" content="{ORIGIN}/logo.png"><meta property="og:image:alt" content="Cubelated logo"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="{E(c['title'])}"><meta name="twitter:description" content="{E(c['description'])}"><meta name="twitter:image" content="{ORIGIN}/logo.png"><meta name="twitter:image:alt" content="Cubelated logo">
 <link rel="icon" href="/logo.png?v=2" type="image/png"><link rel="apple-touch-icon" href="/logo.png?v=2"><link rel="stylesheet" href="/styles.css?v=9"><script src="/app.js?v=9" defer></script><script type="application/ld+json">{json.dumps(schema,ensure_ascii=False)}</script></head>
 <body><a class="skip" href="#main">{c['skip']}</a><header class="header"><a href="#home" class="brand" aria-label="Hanssen Budisantoso Wijaya — {u['nav'][0]}"><img src="/logo.png" alt="" width="36" height="42"><span>Hanssen Budisantoso Wijaya</span></a><nav class="nav" aria-label="{'Main navigation' if isen else '主要導覽'}"><span class="nav-track" aria-hidden="true"></span>{navigation}</nav><label class="language-picker" for="site-language">{icon('globe')}<span class="sr-only">{'Language' if isen else '語言'}</span><select id="site-language" data-language aria-label="{'Language' if isen else '語言'}"><option value="/" lang="en" {'selected' if isen else ''}>English</option><option value="/zh-tw/" lang="zh-Hant" {'' if isen else 'selected'}>繁體中文</option></select>{icon('chevron')}</label><noscript><a href="{langlink}">{language}</a></noscript></header>
 <main id="main"><section id="home" class="hero shell" aria-labelledby="hero-title"><p class="hello">{u['hello']}</p><h1 id="hero-title">{u['hero']}</h1><div class="hero-bottom"><div><p class="intro">{u['intro']}</p><p class="location">{icon("pin")}{u['location']}</p></div><a class="scroll-link" href="#work"><span>{u['scroll']}</span><span class="circle">{icon("arrow-down")}</span></a></div>
@@ -98,5 +117,12 @@ def build():
     for key,c in CONTENT.items():
         path=ROOT/'dist'/c['path'].strip('/')/'index.html'
         path.parent.mkdir(parents=True,exist_ok=True)
-        path.write_text(render(key,c))
+        path.write_text(render(key,c), encoding='utf-8')
+    urls = ''.join(f'<url><loc>{ORIGIN}{c["path"]}</loc></url>' for c in CONTENT.values())
+    (ROOT / 'dist' / 'sitemap.xml').write_text(
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        + urls + '</urlset>\n', encoding='utf-8')
+    (ROOT / 'dist' / 'robots.txt').write_text(
+        f'User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n', encoding='utf-8')
     print('Built English and Traditional Chinese: Home / Work / Contact.')

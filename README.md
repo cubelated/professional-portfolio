@@ -38,7 +38,21 @@ Run `python3 build.py` after changing Python source. The HTML files are generate
 
 ## Publish
 
-The current site uses Sites hosting. Its configuration is in `.openai/hosting.json`. To use another static host, publish the complete `dist/` directory and update `ORIGIN` in `content.py` before rebuilding. Repository storage does not automatically enable GitHub Pages or change the site's audience.
+The production domain is `https://cubelated.com`. Cloudflare should build with `python3 build.py` and publish the complete `dist/` directory. For Workers Static Assets, the deploy command is `npx wrangler deploy --assets ./dist`. Keep the existing Cloudflare Worker name and Git integration. The `.openai/hosting.json` file belongs to the original Sites deployment and is not Cloudflare configuration.
+
+## SEO and indexing
+
+`ORIGIN` in `content.py` is the single source for canonical URLs, language alternatives, structured data, sharing metadata, `robots.txt`, and `sitemap.xml`. Rebuild after changing it. Each language has its own canonical URL; home/work/contact fragments are sections, not separate indexable pages.
+
+After Cloudflare deploys:
+
+- Verify `/` and `/zh-tw/` return HTTP 200 with the new metadata, and a nonexistent URL returns HTTP 404. Keep SPA fallback disabled for this static bilingual site.
+- Use Cloudflare domain redirect rules for HTTP and `www` to `https://cubelated.com`, preserving paths and query strings. Do not use a catch-all path redirect that sends the Chinese page to the English homepage.
+- Verify the `cubelated.com` Domain property in Google Search Console using its supplied DNS TXT record. Submit `https://cubelated.com/sitemap.xml`, then inspect both language URLs and request indexing. Account verification and submission are manual until account access is available.
+- Check Google-selected canonical URLs and indexing coverage after recrawling. Canonical tags and structured data do not guarantee indexing, ranking, or rich results.
+- Validate the JSON-LD with Schema.org Validator and Google's Rich Results Test. Social previews use the existing logo, not a generated cover image.
+
+References: [Google canonical URLs](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls), [multilingual pages](https://developers.google.com/search/docs/specialty/international/localized-versions), [Cloudflare Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/).
 
 ## Checks
 
