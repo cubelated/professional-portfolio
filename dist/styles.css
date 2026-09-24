@@ -154,3 +154,27 @@ h1{font-size:clamp(3rem,8.5vw,7.6rem)}
 }
 @media(max-width:360px){.header{padding-inline:16px}.renew.cover,.selah.cover{padding:20px;gap:12px}}
 @media print{.renew.cover,.selah.cover{display:none}}
+
+
+/* Every additional project has a complete showcase and independent disclosure. */
+.more-projects{gap:48px 28px;align-items:start}
+.more-projects .showcase-project{border-top:0}
+.more-projects .showcase-project .project-copy{padding:25px 0 0}
+.showcase-cover.cover{display:flex;flex-direction:column;gap:22px;height:430px;padding:28px;color:#eff4fb;background:#202e43}
+.showcase-cover .cover-top{gap:16px;align-items:center;flex:none}
+.showcase-cover .cover-brand{min-width:0}
+.showcase-cover .cover-brand>.icon{width:28px;height:28px}
+.showcase-tagline{display:block;font-size:clamp(1.65rem,2.6vw,2.3rem);line-height:1.18;letter-spacing:-.035em;max-width:19ch;font-weight:500;overflow-wrap:break-word}
+.showcase-stack{display:flex;flex-wrap:wrap;align-content:center;gap:10px;flex:1}
+.showcase-stack>span{border:1px solid currentColor;border-radius:99px;padding:8px 14px;font-size:.875rem;line-height:1.4}
+.showcase-preview{display:block;min-height:0;width:100%;flex:1;object-fit:contain;object-position:center;border-radius:8px}
+.showcase-bottom{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:.875rem;line-height:1.5;margin-top:auto;flex:none}
+.showcase-arrow{display:grid;place-items:center;width:34px;height:34px;border:1px solid currentColor;border-radius:50%;flex:none}
+.showcase-arrow>.icon{transform:rotate(45deg);width:18px;height:18px}
+.showcase-flyfitnity.cover{background:#d7e4a7;color:#263522}
+.showcase-learnalgo.cover{background:#d9d2f0;color:#302749}
+.showcase-virtualclass.cover{background:#c9e5ed;color:#203e4c}
+.showcase-learnalgo .showcase-tagline,.showcase-virtualclass .showcase-tagline{font-size:clamp(1.5rem,2vw,1.85rem);max-width:24ch}
+@media(max-width:800px){.showcase-cover.cover{padding:24px;gap:18px}.showcase-tagline{font-size:1.75rem}}
+@media(max-width:640px){.more-projects{gap:35px}.showcase-cover.cover{height:400px}.showcase-tagline{font-size:2rem}.showcase-learnalgo .showcase-tagline,.showcase-virtualclass .showcase-tagline{font-size:1.65rem}}
+@media print{.showcase-cover.cover{display:none}}
