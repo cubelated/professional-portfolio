@@ -241,3 +241,69 @@ document.querySelectorAll('[data-embed]').forEach(link => {
     frame.focus();
   });
 });
+
+// Native horizontal scrolling supplies touch/trackpad navigation without autoplay.
+document.querySelectorAll('[data-video-thumbnail]').forEach(image => {
+  const fallback = () => { image.hidden = true; };
+  image.addEventListener('error', fallback);
+  if (image.complete && !image.naturalWidth) fallback();
+});
+document.querySelectorAll('.media-carousel').forEach(carousel => {
+  const viewport = carousel.querySelector('.carousel-viewport');
+  const slides = [...viewport.children];
+  const controls = carousel.querySelector('.carousel-controls');
+  if (!controls) return;
+  const previous = controls.querySelector('[data-carousel-prev]');
+  const next = controls.querySelector('[data-carousel-next]');
+  const status = controls.querySelector('.carousel-status');
+  let current = 0;
+  let frame = 0;
+  function update() {
+    frame = 0;
+    if (!viewport.clientWidth) return;
+    const index = Math.max(0, Math.min(slides.length - 1, Math.round(viewport.scrollLeft / viewport.clientWidth)));
+    if (index !== current) {
+      const old = slides[current];
+      old.querySelectorAll('video').forEach(video => video.pause());
+      resetEmbeds(old);
+      current = index;
+    }
+    slides.forEach((slide, i) => {
+      slide.inert = i !== current;
+      slide.setAttribute('aria-hidden', String(i !== current));
+    });
+    previous.disabled = current === 0;
+    next.disabled = current === slides.length - 1;
+    status.textContent = `${current + 1} / ${slides.length}`;
+  }
+  function go(index) {
+    const target = Math.max(0, Math.min(slides.length - 1, index));
+    viewport.scrollTo({left:target * viewport.clientWidth, behavior:'smooth'});
+  }
+  previous.addEventListener('click', () => go(current - 1));
+  next.addEventListener('click', () => go(current + 1));
+  viewport.addEventListener('keydown', event => {
+    if (event.target !== viewport) return; // Leave video controls and links alone.
+    const destinations = {ArrowLeft:current-1, ArrowRight:current+1, Home:0, End:slides.length-1};
+    if (!(event.key in destinations)) return;
+    event.preventDefault();
+    go(destinations[event.key]);
+  });
+  viewport.addEventListener('scroll', () => {
+    if (!frame) frame = requestAnimationFrame(update);
+  }, {passive:true});
+  const align = () => {
+    if (!viewport.clientWidth) return;
+    viewport.scrollTo({left:current * viewport.clientWidth, behavior:'instant'});
+    update();
+  };
+  if ('ResizeObserver' in window) new ResizeObserver(align).observe(viewport);
+  else {
+    window.addEventListener('resize', align, {passive:true});
+    carousel.closest('details')?.addEventListener('toggle', align);
+  }
+  controls.hidden = false;
+  previous.disabled = true;
+  slides.forEach((slide, i) => { slide.inert = i !== 0; slide.setAttribute('aria-hidden', String(i !== 0)); });
+  update();
+});

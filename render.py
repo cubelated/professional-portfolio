@@ -16,13 +16,15 @@ def ext(url,label):
 
 def extra_media(p,c):
     isen = c['lang']=='en'
-    media = ''
+    media = []
     if p.get('videoEmbed'):
         label = 'Watch playlist' if p['slug']=='learnalgo' and isen else '觀看播放清單' if p['slug']=='learnalgo' else 'Watch project video' if isen else '觀看專案影片'
-        media += f'<div class="video-embed"><a class="video-launch" href="{E(p["url"])}" target="_blank" rel="noopener noreferrer" data-embed="{E(p["videoEmbed"])}" data-video-title="{E(p["name"])} — {label}">{icon("youtube")}<span>{label}<small>YouTube · {E(p["name"])}</small></span>{icon("play")}</a></div>'
+        thumbnail = p.get('videoThumbnail') or ('/media/' + p['media'][0][0] + '.webp' if p.get('media') else '')
+        preview = f'<img class="video-thumbnail" src="{E(thumbnail)}" alt="" width="480" height="360" loading="lazy" decoding="async" data-video-thumbnail>' if thumbnail else ''
+        media.append(f'<div class="video-embed"><a class="video-launch" href="{E(p["url"])}" target="_blank" rel="noopener noreferrer" data-embed="{E(p["videoEmbed"])}" data-video-title="{E(p["name"])} — {label}">{preview}{icon("youtube")}<span>{label}<small>YouTube · {E(p["name"])}</small></span>{icon("play")}</a></div>')
     for file,w,h,caption in p.get('media',[]):
         full = 'View full-size image' if isen else '查看完整尺寸圖片'
-        media += f'<figure class="project-media"><a href="/media/{file}.webp" target="_blank" rel="noopener noreferrer" aria-label="{full}: {E(caption)}"><img src="/media/{file}.webp" alt="{E(caption)}" width="{w}" height="{h}" loading="lazy" decoding="async"></a><figcaption>{E(caption)} {icon("external")}</figcaption></figure>'
+        media.append(f'<figure class="project-media"><a href="/media/{file}.webp" target="_blank" rel="noopener noreferrer" aria-label="{full}: {E(caption)}"><img src="/media/{file}.webp" alt="{E(caption)}" width="{w}" height="{h}" loading="lazy" decoding="async"></a><figcaption>{E(caption)} {icon("external")}</figcaption></figure>')
     return media
 
 MEDIA = {
@@ -44,13 +46,34 @@ MEDIA = {
         'fallback':'下載靈修流程示範影片'}
 }
 
-def project_media(index,m):
+def media_image(src, width, height, caption):
+    return f'<figure class="project-media"><a href="{E(src)}" target="_blank" rel="noopener noreferrer"><img src="{E(src)}" width="{width}" height="{height}" loading="lazy" decoding="async" alt="{E(caption)}"></a><figcaption>{E(caption)}</figcaption></figure>'
+
+def project_media(index,m,c):
+    if index == 0:
+        return [media_image('/renewables.webp',1080,1920,c['imageAlt'])]
     if index == 1:
-        return f'''<figure class="project-media session-demo"><video controls playsinline preload="none" width="720" height="1544" poster="/media/selah-poster.webp" aria-label="{m['video']}" aria-describedby="selah-video-caption selah-video-description"><source src="/media/selah-walkthrough.mp4" type="video/mp4"><a href="/media/selah-walkthrough.mp4">{m['fallback']}</a></video><figcaption id="selah-video-caption">{m['videoCaption']}</figcaption><p id="selah-video-description" class="video-description">{m['flow']}</p></figure>'''
+        return [media_image('/media/selah-home.webp',600,1286,m['home']),
+            f'<figure class="project-media session-demo"><video controls playsinline preload="none" width="720" height="1544" poster="/media/selah-poster.webp" aria-label="{m["video"]}"><source src="/media/selah-walkthrough.mp4" type="video/mp4"><a href="/media/selah-walkthrough.mp4">{m["fallback"]}</a></video><figcaption>{m["videoCaption"]}</figcaption></figure>']
     if index == 2:
-        images = [('planner-dashboard', 'dashboard', 'dashboardCaption', 1898, 870), ('planner-schedule', 'schedule', 'scheduleCaption', 1900, 869)]
-        return '<div class="project-gallery">' + ''.join(f'''<figure class="project-media"><a href="/media/{file}.webp" target="_blank" rel="noopener noreferrer" aria-label="{m['full']}: {m[caption]}"><img src="/media/{file}.webp" width="{w}" height="{h}" loading="lazy" decoding="async" alt="{m[alt]}"></a><figcaption>{m[caption]}</figcaption></figure>''' for file,alt,caption,w,h in images) + '</div>'
-    return ''
+        return [media_image('/media/planner-dashboard.webp',1898,870,m['dashboard']),
+                media_image('/media/planner-schedule.webp',1900,869,m['schedule'])]
+    return []
+
+def media_carousel(slides, p, c):
+    if not slides:
+        return ''
+    en = c['lang']=='en'
+    slug = p.get('slug',p.get('repo'))
+    label = p['name'] + (' project media' if en else ' 專案媒體')
+    slide_label = 'slide' if en else '投影片'
+    items = ''.join(f'<div class="media-slide" role="group" aria-roledescription="{slide_label}" aria-label="{i+1} / {len(slides)}">{slide}</div>' for i,slide in enumerate(slides))
+    controls = ''
+    if len(slides)>1:
+        previous = 'Previous media' if en else '上一張'
+        following = 'Next media' if en else '下一張'
+        controls = f'<div class="carousel-controls" hidden><button type="button" data-carousel-prev aria-label="{previous}" aria-controls="media-{slug}">{icon("chevron")}</button><span class="carousel-status" aria-live="polite" aria-atomic="true">1 / {len(slides)}</span><button type="button" data-carousel-next aria-label="{following}" aria-controls="media-{slug}">{icon("chevron")}</button></div>'
+    return f'<section class="media-carousel" aria-label="{E(label)}" aria-roledescription="carousel"><div class="carousel-viewport" id="media-{slug}" tabindex="0" aria-label="{E(label)}">{items}</div>{controls}</section>'
 
 def project(p,c,u,index):
     slug=p.get('slug',p.get('repo')); compact=index>=3; typ=['renew','selah','planner'][index] if not compact else ''
@@ -86,7 +109,7 @@ def project(p,c,u,index):
     return f'''<article class="project reveal {"showcase-project" if compact else ""}">{card}<details class="project-details" id="project-{slug}"><summary aria-label="{E(toggle_label)}">
       <span class="project-heading"><span><span class="project-name">{E(p['name'])}</span><span class="project-category">{E(p['category'])}</span></span><span class="expand-icon project-chevron" aria-hidden="true">{icon("chevron")}</span></span>
       <span class="summary-caption">{E(p['tagline'])}</span>
-    </summary><div class="details-content"><div class="project-copy"><p>{E(p['description'])}</p><ul class="tags">{''.join(f'<li>{E(t)}</li>' for t in p['tags'])}</ul>{project_media(index,m)}{extra_media(p,c)}<dl>{case}</dl><div class="project-links">{links}</div></div></div></details></article>'''
+    </summary><div class="details-content"><div class="project-copy"><p>{E(p['description'])}</p><ul class="tags">{''.join(f'<li>{E(t)}</li>' for t in p['tags'])}</ul>{media_carousel(project_media(index,m,c)+extra_media(p,c),p,c)}<dl>{case}</dl><div class="project-links">{links}</div></div></div></details></article>'''
 
 def render(key,c):
     u=UI[key]; isen=key=='en'
@@ -121,7 +144,7 @@ def render(key,c):
 <html lang="{c['lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#111111"><title>{E(c['title'])}</title><meta name="description" content="{E(c['description'])}">
 <link rel="canonical" href="{ORIGIN+c['path']}"><link rel="alternate" hreflang="en" href="{ORIGIN}/"><link rel="alternate" hreflang="zh-Hant" href="{ORIGIN}/zh-tw/"><link rel="alternate" hreflang="x-default" href="{ORIGIN}/"><meta property="og:type" content="website"><meta property="og:title" content="{E(c['title'])}"><meta property="og:description" content="{E(c['description'])}"><meta property="og:url" content="{ORIGIN+c['path']}"><meta property="og:locale" content="{'en_US' if isen else 'zh_TW'}">
 <meta property="og:site_name" content="Cubelated"><meta property="og:locale:alternate" content="{'zh_TW' if isen else 'en_US'}"><meta property="og:image" content="{ORIGIN}/logo.png"><meta property="og:image:alt" content="Cubelated logo"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="{E(c['title'])}"><meta name="twitter:description" content="{E(c['description'])}"><meta name="twitter:image" content="{ORIGIN}/logo.png"><meta name="twitter:image:alt" content="Cubelated logo">
-<link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" sizes="any"><link rel="apple-touch-icon" href="/logo.png?v=2"><link rel="stylesheet" href="/styles.css?v=11"><script src="/app.js?v=10" defer></script><script type="application/ld+json">{json.dumps(schema,ensure_ascii=False)}</script></head>
+<link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" sizes="any"><link rel="apple-touch-icon" href="/logo.png?v=2"><link rel="stylesheet" href="/styles.css?v=12"><script src="/app.js?v=11" defer></script><script type="application/ld+json">{json.dumps(schema,ensure_ascii=False)}</script></head>
 <body><a class="skip" href="#main">{c['skip']}</a><header class="header"><a href="#home" class="brand" aria-label="Hanssen Budisantoso Wijaya — {u['nav'][0]}"><img src="/logo.png" alt="" width="36" height="42"><span>Hanssen Budisantoso Wijaya</span></a><nav class="nav" aria-label="{'Main navigation' if isen else '主要導覽'}"><span class="nav-track" aria-hidden="true"></span>{navigation}</nav><label class="language-picker" for="site-language">{icon('globe')}<span class="sr-only">{'Language' if isen else '語言'}</span><select id="site-language" data-language aria-label="{'Language' if isen else '語言'}"><option value="/" lang="en" {'selected' if isen else ''}>English</option><option value="/zh-tw/" lang="zh-Hant" {'' if isen else 'selected'}>繁體中文</option></select>{icon('chevron')}</label><noscript><a href="{langlink}">{language}</a></noscript></header>
 <main id="main"><section id="home" class="hero shell" aria-labelledby="hero-title"><p class="hello">{u['hello']}</p><h1 id="hero-title">{u['hero']}</h1><div class="hero-bottom"><div><p class="intro">{u['intro']}</p><p class="location">{icon("pin")}{u['location']}</p></div><a class="scroll-link" href="#work"><span>{u['scroll']}</span><span class="circle">{icon("arrow-down")}</span></a></div>
 <details class="background"><summary><span class="with-icon">{icon("briefcase")}{u['background']}</span><span class="expand-icon" aria-hidden="true">+</span></summary><div class="details-content"><div class="background-content"><div><p class="bio">{E(c['aboutText'][0])}</p><ul class="jobs">{jobs}</ul></div><div><div class="skills">{skills}</div><div class="education">{schools}</div></div></div></div></details></section>

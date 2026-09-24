@@ -200,3 +200,29 @@ h1{font-size:clamp(3rem,8.5vw,7.6rem)}
  .project-details>summary:hover{transform:none;filter:none;background:#202020}
 }
 @media(max-width:640px){.project-details>summary{padding:16px}.project .project-copy,.more-projects .showcase-project .project-copy{padding:16px 16px 22px}.project-card-link,.project-card-static{border-radius:14px}}
+
+/* Scroll-snap media galleries retain native swipe and a no-script scrollbar. */
+.media-carousel{margin:24px 0 28px;min-width:0}
+.carousel-viewport{display:flex;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;border-radius:12px;background:#191a1e;scrollbar-width:thin}
+.media-slide{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always;padding:16px}
+.media-slide .project-media{margin:0}
+.media-slide .project-media>a{height:clamp(220px,32vw,430px);display:flex;align-items:center;justify-content:center}
+.media-slide .project-media img{width:100%;height:100%;object-fit:contain;border-radius:6px}
+.media-slide .project-media a:hover{outline-offset:-2px}
+.media-slide .session-demo video{height:clamp(220px,32vw,430px);width:100%;max-width:100%;object-fit:contain;border:0;border-radius:6px;background:#111}
+.media-slide .project-media figcaption{font-size:.875rem;margin-top:12px;text-align:left}
+.media-slide .video-embed{margin:0;width:100%;height:clamp(220px,32vw,430px);aspect-ratio:auto}
+.video-launch{position:relative;isolation:isolate;overflow:hidden;background:#151515}
+.video-thumbnail{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:-2}
+.video-launch::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 30%,#000c);z-index:-1;pointer-events:none}
+.video-launch>span,.video-launch>.icon{position:relative;color:white;text-shadow:0 2px 5px #000}
+.video-launch small{color:#eee}
+.carousel-controls{display:flex;justify-content:center;align-items:center;gap:20px;margin-top:14px}
+.carousel-controls button{display:grid;place-items:center;width:44px;height:44px;border:1px solid #444;border-radius:50%;background:#222;cursor:pointer;transition:background var(--motion-fast),opacity var(--motion-fast)}
+.carousel-controls button:hover:not(:disabled){background:#363636}
+.carousel-controls button:disabled{opacity:.35;cursor:default}
+.carousel-controls [data-carousel-prev] .icon{transform:rotate(90deg)}
+.carousel-controls [data-carousel-next] .icon{transform:rotate(-90deg)}
+.carousel-status{min-width:5ch;text-align:center;font-size:.875rem;font-variant-numeric:tabular-nums}
+@media(max-width:640px){.media-slide{padding:12px}.media-carousel{margin:20px 0 24px}.media-slide .project-media>a,.media-slide .session-demo video,.media-slide .video-embed{height:280px}}
+@media print{.carousel-viewport{display:block;overflow:visible}.media-slide{break-inside:avoid}.carousel-controls{display:none}}
