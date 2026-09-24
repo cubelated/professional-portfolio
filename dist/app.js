@@ -158,40 +158,55 @@ document.fonts?.ready.then(() => settleDisclosures.forEach(settle => settle()));
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) document.querySelectorAll('video').forEach(video => video.pause());
 });
-const revealAnimations = new Set();
-let revealObserver = null;
-const revealed = new WeakSet();
-function observeReveals() {
-  if (!('IntersectionObserver' in window)) return;
-  revealObserver ??= new IntersectionObserver(entries => {
-    let stagger = 0;
+// Prepare only offscreen content before it can enter the viewport. Starting an
+// opacity animation on already-visible text causes a visible -> hidden flash.
+const revealAnimations = new Map();
+if ('IntersectionObserver' in window && Element.prototype.animate) {
+  const finishReveal = element => {
+    const animation = revealAnimations.get(element);
+    if (!animation) return;
+    revealObserver.unobserve(element);
+    revealAnimations.delete(element);
+    animation.onfinish = null;
+    animation.cancel(); // Restore the visible CSS state and release the layer.
+  };
+  const revealObserver = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
-      revealObserver.unobserve(entry.target);
-      revealed.add(entry.target);
-      if (!entry.target.animate || entry.target.contains(document.activeElement)) return;
-      const animation = entry.target.animate(
-        [{opacity:0, transform:'translateY(18px)'}, {opacity:1, transform:'translateY(0)'}],
-        {duration:duration('reveal'), delay:Math.min(stagger++ * 45, 135), easing, fill:'backwards'}
-      );
-      revealAnimations.add(animation);
-      const clear = () => revealAnimations.delete(animation);
-      animation.onfinish = clear;
-      animation.oncancel = clear;
+      const element = entry.target;
+      revealObserver.unobserve(element);
+      const animation = revealAnimations.get(element);
+      if (!animation) return;
+      if (element.contains(document.activeElement)) finishReveal(element);
+      else animation.play();
     });
-  }, {threshold:0, rootMargin:'0px 0px -24px 0px'});
-  // Nothing is hidden in CSS: no-script and unsupported browsers stay readable.
+  }, {threshold:0, rootMargin:'0px 0px 80px 0px'});
   const revealTargets = '.hero .hello, .hero h1, .hero-bottom, .background, .section-heading, .project, .contact-kicker, .contact h2, .contact-actions, .email-address, .contact-foot, .footer';
-  document.querySelectorAll(revealTargets).forEach(element => {
-    if (!revealed.has(element)) revealObserver.observe(element);
+  const candidates = [...document.querySelectorAll(revealTargets)].filter(element =>
+    element.getBoundingClientRect().top >= window.innerHeight &&
+    !element.contains(document.activeElement)
+  );
+  candidates.forEach(element => {
+    const animation = element.animate(
+      [{opacity:0, transform:'translateY(18px)'}, {opacity:1, transform:'translateY(0)'}],
+      {duration:duration('reveal'), easing, fill:'both'}
+    );
+    animation.pause();
+    animation.currentTime = 0;
+    revealAnimations.set(element, animation);
+    animation.onfinish = () => finishReveal(element);
+    revealObserver.observe(element);
+  });
+  // Keyboard users and restored pages must never land on hidden content.
+  document.addEventListener('focusin', event => {
+    revealAnimations.forEach((animation, element) => {
+      if (element.contains(event.target)) finishReveal(element);
+    });
+  });
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) [...revealAnimations.keys()].forEach(finishReveal);
   });
 }
-observeReveals();
-document.addEventListener('focusin', event => {
-  revealAnimations.forEach(animation => {
-    if (animation.effect?.target.contains(event.target)) animation.cancel();
-  });
-});
 const copy = document.querySelector('[data-copy]');
 if (navigator.clipboard?.writeText) {
   copy.hidden = false;
