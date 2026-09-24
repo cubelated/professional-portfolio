@@ -178,3 +178,25 @@ h1{font-size:clamp(3rem,8.5vw,7.6rem)}
 @media(max-width:800px){.showcase-cover.cover{padding:24px;gap:18px}.showcase-tagline{font-size:1.75rem}}
 @media(max-width:640px){.more-projects{gap:35px}.showcase-cover.cover{height:400px}.showcase-tagline{font-size:2rem}.showcase-learnalgo .showcase-tagline,.showcase-virtualclass .showcase-tagline{font-size:1.65rem}}
 @media print{.showcase-cover.cover{display:none}}
+
+
+/* Card links navigate; padded summary rows independently toggle details. */
+.project-card-link,.project-card-static{display:block;border-radius:18px}
+.project-card-link{transition:transform var(--motion-base) var(--ease),filter var(--motion-base) var(--ease)}
+.project-card-link:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
+.project-card-link .explore{opacity:1;transform:none}
+.project-card-static .showcase-arrow,.project-card-static .explore{display:none}
+.project-details>summary{margin-top:8px;padding:18px 20px;border-radius:12px;transition:background-color var(--motion-base),color var(--motion-base);min-height:72px}
+.project-details>summary .project-heading{margin-top:0;gap:18px}
+.project-details>summary .summary-caption{margin-top:8px;padding-right:38px}
+.project-details>summary .project-chevron{display:grid;place-items:center;width:32px;height:32px;flex:none;font-size:inherit;transform:rotate(0deg);transition:transform var(--motion-base) var(--ease)}
+.project-details[open]>summary .project-chevron{transform:rotate(180deg)}
+.project-details[data-expanded="false"]>summary .project-chevron{transform:rotate(0deg)}
+.project .project-copy,.more-projects .showcase-project .project-copy{padding:18px 20px 24px}
+@media(hover:hover) and (pointer:fine){
+ .project-card-link:hover{transform:translateY(-3px);filter:brightness(1.04)}
+ .project-card-link:hover .renew-screen{transform:rotate(-4deg) translateY(-14px)}
+ .project-card-link:hover .selah-screen,.project-card-link:hover .planner-screen{transform:translateY(-3px)}
+ .project-details>summary:hover{transform:none;filter:none;background:#202020}
+}
+@media(max-width:640px){.project-details>summary{padding:16px}.project .project-copy,.more-projects .showcase-project .project-copy{padding:16px 16px 22px}.project-card-link,.project-card-static{border-radius:14px}}
