@@ -19,6 +19,7 @@ Open `http://localhost:8000/` for English or `http://localhost:8000/zh-tw/` for 
 | --- | --- |
 | `content.py` | Profile, experience, and featured projects in both languages |
 | `additional_projects.py` | Additional projects and YouTube media |
+| `company_projects.py` | Employer-owned projects and company attribution |
 | `render.py` | HTML templates, navigation, and short interface copy |
 | `icons.py` | Inline SVG icon helpers |
 | `dist/styles.css` | Responsive layouts, spacing, and transition timing |
@@ -30,6 +31,8 @@ Run `python3 build.py` after changing Python source. The HTML files are generate
 ## Interaction details
 
 - Three primary destinations: Home, Work, Contact.
+- Nine equally weighted project cards in a three-column grid, with two columns on tablets and one on phones. Labels distinguish company work, personal, community, internship, research, and academic projects.
+- Show six cards initially, with a control to view all nine or collapse the list. Filters group company work and internships under Professional, independent apps under Personal, and community/university projects under Community & Research. All projects remain available when JavaScript is disabled and when printing.
 - English is the default; the language dropdown preserves the active section.
 - Native details and direct media links keep core content available without JavaScript.
 - YouTube embeds load only after a click and are removed when their project closes.
@@ -61,8 +64,10 @@ python3 build.py
 node --check dist/app.js
 ```
 
-Manually review both languages at mobile, tablet, and desktop widths; verify keyboard focus, rapid disclosure toggles, hover transitions, header navigation, and media playback. This environment does not provide a compatible browser preview for this static project, so source checks are not a substitute for visual browser QA.
+Review both languages at mobile, tablet, and desktop widths; verify keyboard focus, rapid disclosure toggles, hover transitions, header navigation, and media playback. The project grid was checked in headless Chrome at 1440, 900, 390, and 320 pixels for column counts, overflow, labels, links, media placement, and disclosure behavior.
 
 ## Assets and attribution
+
+The supplied banner, CashierInside and IFGF Cloud PNGs have lightweight WebP copies for inline use. The original PNGs remain available for full-size viewing. HostingInside's supplied SVG is used on its company project covers. Flyfitnity's cover and gallery images come from pages 15, 2, and 13 of the supplied presentation PDF, which is linked from its project details. These optimized assets are checked in; the regular Python build needs no image-processing packages.
 
 Project identity, copy, logos, screenshots, and videos belong to their respective owners. Third-party icon attribution is in `THIRD_PARTY_NOTICES.md`. No additional open-source license is granted by this repository.

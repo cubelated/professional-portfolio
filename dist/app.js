@@ -158,6 +158,55 @@ document.fonts?.ready.then(() => settleDisclosures.forEach(settle => settle()));
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) document.querySelectorAll('video').forEach(video => video.pause());
 });
+
+// Enhance the complete HTML list: every project stays available without JavaScript.
+const projectGrid = document.getElementById('project-grid');
+const projectFilters = document.querySelector('[data-project-filters]');
+if (projectGrid && projectFilters) {
+  const cards = [...projectGrid.querySelectorAll('[data-project-group]')];
+  const filters = [...projectFilters.querySelectorAll('[data-project-filter]')];
+  const count = document.querySelector('[data-project-count]');
+  const more = document.querySelector('[data-project-more]');
+  const expand = more.querySelector('[data-project-expand]');
+  const limit = Number(projectGrid.dataset.projectLimit) || 6;
+  let category = 'all';
+  let expanded = false;
+
+  function updateProjects() {
+    settleDisclosures.forEach(settle => settle());
+    const matches = cards.filter(card => category === 'all' || card.dataset.projectGroup === category);
+    const visible = expanded ? matches : matches.slice(0, limit);
+    cards.forEach(card => {
+      const hide = !visible.includes(card);
+      if (hide && !card.hidden) {
+        card.querySelectorAll('video').forEach(video => video.pause());
+        resetEmbeds(card);
+      }
+      card.hidden = hide;
+    });
+    filters.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.projectFilter === category)));
+    count.textContent = count.dataset.countLabel.replace('{visible}', visible.length).replace('{total}', matches.length);
+    more.hidden = matches.length <= limit;
+    expand.setAttribute('aria-expanded', String(expanded));
+    const label = expanded ? expand.dataset.fewerLabel : expand.dataset.moreLabel.replace('{total}', matches.length);
+    // Keep the decorative arrow while updating the localized button text.
+    expand.firstChild.textContent = label;
+  }
+
+  filters.forEach(button => button.addEventListener('click', () => {
+    category = button.dataset.projectFilter;
+    expanded = false;
+    updateProjects();
+  }));
+  expand.addEventListener('click', () => {
+    expanded = !expanded;
+    updateProjects();
+    if (!expanded) expand.scrollIntoView({block:'nearest', behavior:'instant'});
+  });
+  updateProjects();
+  projectFilters.hidden = false;
+}
+
 // Prepare only offscreen content before it can enter the viewport. Starting an
 // opacity animation on already-visible text causes a visible -> hidden flash.
 const revealAnimations = new Map();
@@ -208,14 +257,26 @@ if ('IntersectionObserver' in window && Element.prototype.animate) {
   });
 }
 const copy = document.querySelector('[data-copy]');
+const snackbar = document.querySelector('[data-snackbar]');
+let snackbarTimer;
+function showSnackbar(message, failed = false) {
+  clearTimeout(snackbarTimer);
+  snackbar.querySelector('[data-snackbar-message]').textContent = message;
+  snackbar.querySelector('[data-snackbar-success]').hidden = failed;
+  snackbar.querySelector('[data-snackbar-error]').hidden = !failed;
+  snackbar.classList.add('is-visible');
+  snackbarTimer = setTimeout(() => {
+    snackbar.classList.remove('is-visible');
+    snackbar.querySelector('[data-snackbar-message]').textContent = '';
+  }, failed ? 6000 : 4000);
+}
 if (navigator.clipboard?.writeText) {
   copy.hidden = false;
   copy.addEventListener('click', async () => {
-    const status = document.querySelector('.copy-status');
     try {
       await navigator.clipboard.writeText('hanssenbudi@gmail.com');
-      status.textContent = copy.dataset.copied;
-    } catch { status.textContent = copy.dataset.failed; }
+      showSnackbar(copy.dataset.copied);
+    } catch { showSnackbar(copy.dataset.failed, true); }
   });
 }
 
