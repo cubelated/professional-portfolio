@@ -330,10 +330,9 @@ h1{font-size:clamp(3rem,8.5vw,7.6rem)}
 .hero-visual h1{font-size:clamp(3rem,7.2vw,6.8rem);max-width:780px}
 .hero-visual .intro{color:#e1e1e1}
 .hero-visual .hello,.hero-visual .location{color:#c4c4c4}
-.project-grid .cover .company-logo{width:90px;height:32px;object-fit:contain;border-radius:0;background:transparent;padding:0;flex:none}
 .project-grid .showcase-preview{border:1px solid #0002;box-shadow:0 8px 18px #0002}
 @media(max-width:1050px){.hero-visual{padding:36px 28px}.hero-banner{opacity:.75}}
-@media(max-width:640px){.hero{padding-top:20px}.hero-visual{padding:28px 20px;border-radius:18px}.hero-banner{opacity:.3;object-position:75% center}.hero-visual::after{background:linear-gradient(90deg,#111b,#1113)}.hero-visual h1{font-size:clamp(2.35rem,10vw,4.2rem)}html[lang=zh-Hant] .hero-visual h1{font-size:clamp(2rem,8.5vw,3.5rem)}.hero-visual .hero-bottom{margin-top:28px}.project-grid .cover .company-logo{width:78px}}
+@media(max-width:640px){.hero{padding-top:20px}.hero-visual{padding:28px 20px;border-radius:18px}.hero-banner{opacity:.3;object-position:75% center}.hero-visual::after{background:linear-gradient(90deg,#111b,#1113)}.hero-visual h1{font-size:clamp(2.35rem,10vw,4.2rem)}html[lang=zh-Hant] .hero-visual h1{font-size:clamp(2rem,8.5vw,3.5rem)}.hero-visual .hero-bottom{margin-top:28px}}
 @media print{.hero-banner{display:none}.hero-visual{padding:0;background:none}.hero-visual::after{display:none}.hero-visual h1{font-size:40px}.hero-visual .intro,.hero-visual .hello,.hero-visual .location{color:#333}}
 
 /* Services and contact destinations share a single, wrapping action row. */
@@ -365,5 +364,19 @@ h1{font-size:clamp(3rem,8.5vw,7.6rem)}
 @media(prefers-reduced-motion:reduce){.snackbar{transition:none}}
 @media print{.snackbar{display:none!important}}
 
-.project-grid .project .cover .project-wordmark{width:90px;height:28px;object-fit:contain;border-radius:0;background:transparent}
-.project-grid .project .cover .logo-monochrome{filter:brightness(0)}
+.project-grid .cover-brand>.project-icon{display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;overflow:hidden;border-radius:8px;padding:var(--project-icon-padding,0px);background:var(--bg);color:var(--ink);border:0;box-shadow:none}
+.project-grid .project .cover .project-icon>.project-logo{display:block;width:100%;height:100%;max-width:100%;object-fit:contain;border-radius:0;background:transparent;padding:0}
+.project-grid .cover .project-icon>.icon{width:28px;height:28px}
+
+/* Transparent marks share the site's charcoal app-icon tile. */
+.showcase-dciminside,.showcase-cashierinside,.planner,.showcase-ifgf-cloud,.showcase-flyfitnity,.showcase-virtualclass{--project-icon-padding:3px}
+
+/* Preview windows fill their layout cells; screenshots stay flush and flat. */
+.project-grid .cover .project-preview{display:block;position:relative;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden;border-radius:10px}
+.project-grid .renew .project-preview,.project-grid .selah .project-preview{grid-column:2;grid-row:2}
+.project-grid .planner .project-preview{grid-column:1;grid-row:3}
+.project-grid .showcase-cover .project-preview{flex:1 1 0;height:auto;align-self:stretch}
+.project-grid .cover .project-preview>img{display:block;position:static;width:100%;height:100%;min-width:0;min-height:0;max-width:100%;max-height:none;margin:0;object-fit:cover;object-position:center;transform:none;filter:none;box-shadow:none;border:0;border-radius:0;transition:none}
+.project-grid .renew .project-preview>img,.project-grid .selah .project-preview>img{object-position:center top}
+.project-grid .planner .project-preview>img{object-position:left top}
+.project-grid .showcase-virtualclass .project-preview>img{object-position:center 35%}

@@ -68,6 +68,8 @@ Review both languages at mobile, tablet, and desktop widths; verify keyboard foc
 
 ## Assets and attribution
 
+Browser icons use a square SVG viewport with proportional fitting, transparent 16×16 and 32×32 PNG fallbacks, and a 180×180 touch icon. The original rectangular `logo.png` remains unchanged; padding prevents the favicon artwork from being stretched into a square.
+
 The supplied banner, CashierInside and IFGF Cloud PNGs have lightweight WebP copies for inline use. The original PNGs remain available for full-size viewing. HostingInside's supplied SVG is used on its company project covers. Flyfitnity's cover and gallery images come from pages 15, 2, and 13 of the supplied presentation PDF, which is linked from its project details. These optimized assets are checked in; the regular Python build needs no image-processing packages.
 
 Project identity, copy, logos, screenshots, and videos belong to their respective owners. Third-party icon attribution is in `THIRD_PARTY_NOTICES.md`. No additional open-source license is granted by this repository.

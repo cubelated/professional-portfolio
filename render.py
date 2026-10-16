@@ -7,7 +7,7 @@ from additional_projects import EXTRA_PROJECTS
 from company_projects import COMPANY_PROJECTS
 
 UI = {
- 'en': {'nav':['Home','Work','Contact'],'hello':'Hi, I’m Hanssen, also known as Cubelated.','hero':'Software with<br><span>purpose.</span>','intro':'I build mobile apps, web platforms, and connected systems that make everyday work feel simpler.','location':'Software Engineer · Full-Stack, Mobile Apps & System Integration','scroll':'Explore selected work','background':'A little about me','work':'Selected work','selected':'03 projects','open':'Explore project','close':'Close details','contact':'Good things start<br>with a <span>conversation.</span>','say':'Have a project in mind or a role to fill?','email':'Email me','copy':'Copy email','copied':'Email copied','failed':'Couldn’t copy. Use the email link.','links':'Elsewhere','footer':'Built with purpose.','back':'Back to top','renew':'Keep what matters.<br>Never miss a date.','selah':'Pause.<br>Pray.<br><i>Praise.</i>','planner':'People.<br>Plans.<br><span>Connected.</span>','renewSubtitle':'Life admin, simplified.','selahSubtitle':'A little space for stillness.','plannerSubtitle':'A clearer way to coordinate.','more':'Experience & skills'},
+ 'en': {'nav':['Home','Work','Contact'],'hello':'Hi, I’m Hanssen, also known as Cubelated.','hero':'Software with<br><span>purpose.</span>','intro':'I build mobile apps, web platforms, and connected systems that make everyday work feel simpler.','location':'Software Engineer · Full-Stack, Mobile Apps & System Integration','scroll':'Explore selected work','background':'A little about me','work':'Selected work','selected':'03 projects','open':'Explore project','close':'Close details','contact':'Good things start<br>with a <span>conversation.</span>','say':'Have a project in mind or a role to fill?','email':'Email me','copy':'Copy email','copied':'Email copied','failed':'Couldn’t copy. Use the email link.','links':'Elsewhere','footer':'Built with purpose.','back':'Back to top','renew':'Keep what matters.<br>Never miss a date.','selah':'Pause.<br>Praise.<br><i>Pray.</i>','planner':'People.<br>Plans.<br><span>Connected.</span>','renewSubtitle':'Life admin, simplified.','selahSubtitle':'A little space for stillness.','plannerSubtitle':'A clearer way to coordinate.','more':'Experience & skills'},
  'zh': {'nav':['首頁','作品','聯絡'],'hello':'你好，我是黃晟旺，也叫 Cubelated。','hero':'用軟體，<br><span>解決真實問題。</span>','intro':'打造行動應用、網頁平台與整合系統，讓日常工作少一點繁瑣。','location':'軟體工程師・全端開發、行動應用與系統整合','scroll':'探索精選作品','background':'多認識我一點','work':'精選作品','selected':'03 個專案','open':'探索專案','close':'收起內容','contact':'好的合作，<br>從<span>對話</span>開始。','say':'正在規劃新專案，或尋找工程夥伴嗎？','email':'寄信給我','copy':'複製信箱','copied':'已複製信箱','failed':'無法複製，請使用信箱連結。','links':'也可以在這裡找到我','footer':'用心打造。','back':'回到頂端','renew':'重要的事，<br>不再錯過期限。','selah':'停下。<br>禱告。<br><i>讚美。</i>','planner':'團隊。<br>安排。<br><span>連結。</span>','renewSubtitle':'把生活瑣事，變得簡單。','selahSubtitle':'為安靜，留一點空間。','plannerSubtitle':'更清楚的團隊協調方式。','more':'經歷與技能'}
 }
 
@@ -97,27 +97,27 @@ def project_cover(p,c,u,index):
     m=MEDIA['en' if c['lang']=='en' else 'zh']
     typ = {'renewables':'renew', 'selah':'selah', 'ifgf-planner':'planner'}.get(slug)
     logo_file = {'renewables':'renewables-logo', 'selah':'selah-logo'}.get(slug) or p.get('logo')
-    brand = f'<img class="project-logo" src="/media/{logo_file}.webp" width="32" height="32" alt="" loading="lazy">' if logo_file else icon(p.get('icon','briefcase'))
-    if logo_file and p.get('logoWordmark'):
-        tone = ' logo-monochrome' if p.get('logoMonochrome') else ''
-        brand = f'<img class="project-logo project-wordmark{tone}" src="/media/{logo_file}.webp" width="90" height="28" alt="" loading="lazy" decoding="async">'
-    if p.get('logoSrc'):
-        brand = f'<img class="project-logo company-logo" src="{E(p["logoSrc"])}" width="90" height="32" alt="" loading="lazy" decoding="async">'
+    logo_src = p.get('logoSrc') or ('/media/' + logo_file + '.webp' if logo_file else '')
+    if logo_src:
+        brand = f'<img class="project-logo" src="{E(logo_src)}" width="36" height="36" alt="" loading="lazy" decoding="async">'
+    else:
+        brand = icon(p.get('icon','briefcase'))
+    brand = f'<span class="project-icon" aria-hidden="true">{brand}</span>'
     top = f'<span class="cover-top"><span class="cover-brand">{brand}{E(p["name"])}</span><span>{index+1:02d}</span></span>'
     if typ:
         cover_words = u[typ].replace('<br>', ' ') if typ == 'planner' else u[typ]
         visual = f'<span class="cover-words">{cover_words}</span>'
         if slug == 'renewables':
-            visual += f'<img class="renew-screen" src="/renewables.webp" alt="{E(c["imageAlt"])}" width="1080" height="1920" loading="lazy" decoding="async">'
+            visual += f'<span class="project-preview"><img class="renew-screen" src="/renewables.webp" alt="{E(c["imageAlt"])}" width="1080" height="1920" loading="lazy" decoding="async"></span>'
         elif slug == 'selah':
-            visual += f'<img class="selah-screen" src="/media/selah-home.webp" alt="{m["home"]}" width="600" height="1286" loading="lazy" decoding="async">'
+            visual += f'<span class="project-preview"><img class="selah-screen" src="/media/selah-home.webp" alt="{m["home"]}" width="600" height="1286" loading="lazy" decoding="async"></span>'
         else:
-            visual += f'<img class="planner-screen" src="/media/planner-dashboard.webp" alt="{m["dashboard"]}" width="1898" height="870" loading="lazy" decoding="async">'
+            visual += f'<span class="project-preview"><img class="planner-screen" src="/media/planner-dashboard.webp" alt="{m["dashboard"]}" width="1898" height="870" loading="lazy" decoding="async"></span>'
         cover = f'<span class="cover {typ}">{top}{visual}<span class="cover-bottom">{E(u[typ+"Subtitle"])}</span></span>'
     else:
         if p.get('coverMedia') or p.get('media'):
             file,width,height,caption = p.get('coverMedia') or p['media'][0]
-            visual = f'<img class="showcase-preview" src="/media/{file}.webp" alt="{E(caption)}" width="{width}" height="{height}" loading="lazy" decoding="async">'
+            visual = f'<span class="project-preview"><img class="showcase-preview" src="/media/{file}.webp" alt="{E(caption)}" width="{width}" height="{height}" loading="lazy" decoding="async"></span>'
         else:
             visual = '<span class="showcase-stack">' + ''.join(f'<span>{E(tag)}</span>' for tag in p['tags'][:3]) + '</span>'
         cover = f'<span class="cover showcase-cover showcase-{slug}">{top}<span class="showcase-tagline">{E(p["tagline"])}</span>{visual}<span class="showcase-bottom">{E(p["category"])}</span></span>'
@@ -203,7 +203,7 @@ def render(key,c):
 <html lang="{c['lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#111111"><title>{E(c['title'])}</title><meta name="description" content="{E(c['description'])}">
 <link rel="canonical" href="{ORIGIN+c['path']}"><link rel="alternate" hreflang="en" href="{ORIGIN}/"><link rel="alternate" hreflang="zh-Hant" href="{ORIGIN}/zh-tw/"><link rel="alternate" hreflang="x-default" href="{ORIGIN}/"><meta property="og:type" content="website"><meta property="og:title" content="{E(c['title'])}"><meta property="og:description" content="{E(c['description'])}"><meta property="og:url" content="{ORIGIN+c['path']}"><meta property="og:locale" content="{'en_US' if isen else 'zh_TW'}">
 <meta property="og:site_name" content="Cubelated"><meta property="og:locale:alternate" content="{'zh_TW' if isen else 'en_US'}"><meta property="og:image" content="{ORIGIN}/logo.png"><meta property="og:image:alt" content="Cubelated logo"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="{E(c['title'])}"><meta name="twitter:description" content="{E(c['description'])}"><meta name="twitter:image" content="{ORIGIN}/logo.png"><meta name="twitter:image:alt" content="Cubelated logo">
-<link rel="icon" href="/logo.png?v=2" type="image/png"><link rel="apple-touch-icon" href="/logo.png?v=2"><link rel="stylesheet" href="/styles.css?v=18"><script src="/app.js?v=11" defer></script><script type="application/ld+json">{json.dumps(schema,ensure_ascii=False)}</script></head>
+<link rel="icon" href="/favicon-32x32.png?v=3" type="image/png" sizes="32x32"><link rel="icon" href="/favicon-16x16.png?v=3" type="image/png" sizes="16x16"><link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" sizes="180x180"><link rel="stylesheet" href="/styles.css?v=22"><script src="/app.js?v=11" defer></script><script type="application/ld+json">{json.dumps(schema,ensure_ascii=False)}</script></head>
 <body><a class="skip" href="#main">{c['skip']}</a><header class="header"><a href="#home" class="brand" aria-label="{E(primary_name)} — {u['nav'][0]}"><img src="/logo.png" alt="" width="36" height="42"><span>{E(primary_name)}</span></a><nav class="nav" aria-label="{'Main navigation' if isen else '主要導覽'}"><span class="nav-track" aria-hidden="true"></span>{navigation}</nav><label class="language-picker" for="site-language">{icon('globe')}<span class="sr-only">{'Language' if isen else '語言'}</span><select id="site-language" data-language aria-label="{'Language' if isen else '語言'}"><option value="/" lang="en" {'selected' if isen else ''}>English</option><option value="/zh-tw/" lang="zh-Hant" {'' if isen else 'selected'}>繁體中文</option></select>{icon('chevron')}</label><noscript><a href="{langlink}">{language}</a></noscript></header>
 <main id="main"><section id="home" class="hero shell" aria-labelledby="hero-title"><div class="hero-visual"><img class="hero-banner" src="/media/banner.webp" alt="" width="1920" height="640" fetchpriority="high" decoding="async"><p class="hello">{u['hello']}</p><h1 id="hero-title">{u['hero']}</h1><div class="hero-bottom"><div><p class="intro">{u['intro']}</p><p class="location">{icon("briefcase")}<span>{E(u['location'])}</span></p></div><a class="scroll-link" href="#work"><span>{u['scroll']}</span><span class="circle">{icon("arrow-down")}</span></a></div></div>
 <details class="background"><summary><span class="with-icon">{icon("user")}{u['background']}</span><span class="expand-icon" aria-hidden="true">+</span></summary><div class="details-content"><div class="background-content"><div><p class="bio">{E(c['aboutText'][0])}</p><ul class="jobs">{jobs}</ul></div><div><div class="skills">{skills}</div><div class="education">{schools}</div></div></div></div></details></section>
@@ -217,7 +217,7 @@ def build():
     logo = base64.b64encode((ROOT / 'dist' / 'logo.png').read_bytes()).decode('ascii')
     (ROOT / 'dist' / 'favicon.svg').write_text(
         '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">'
-        '<image width="64" height="64" preserveAspectRatio="xMidYMid meet" '
+        '<image x="4" y="4" width="56" height="56" preserveAspectRatio="xMidYMid meet" '
         f'href="data:image/png;base64,{logo}"/></svg>\n', encoding='utf-8')
     for key,c in CONTENT.items():
         path=ROOT/'dist'/c['path'].strip('/')/'index.html'
