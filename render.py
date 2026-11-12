@@ -1,5 +1,5 @@
 """Static, bilingual portfolio. Native disclosures keep every detail accessible."""
-from content import CONTENT, ROOT, ORIGIN, E
+from content import CONTENT, ROOT, ORIGIN, SITE_NAME, E
 import json
 import base64
 from icons import icon
@@ -186,23 +186,34 @@ def render(key,c):
     page_url = ORIGIN + c['path']
     schema = {'@context': 'https://schema.org', '@graph': [
         {'@type': 'Person', '@id': person_id,
-         'name': primary_name, 'alternateName': ['黃晟旺', 'Hanssen Budi', 'Cubelated'] if isen else ['Cubelated'],
+         'name': SITE_NAME, 'alternateName': ['黃晟旺', 'Hanssen Budi', 'Cubelated'],
+         'description': c['aboutText'][0],
          'jobTitle': 'Software Engineer', 'url': ORIGIN + '/',
          'knowsAbout': ['Full-stack development', 'Flutter', 'Mobile application development', 'Systems integration'],
          'sameAs': ['https://github.com/cubelated',
                     'https://www.linkedin.com/in/hanssen-budisantoso-wijaya/',
                     'https://www.youtube.com/@cubelated']},
         {'@type': 'WebSite', '@id': website_id, 'url': ORIGIN + '/',
-         'name': 'Cubelated', 'alternateName': primary_name,
+         'name': SITE_NAME, 'alternateName': ['Hanssen Budi', 'Cubelated', '黃晟旺'],
          'inLanguage': ['en', 'zh-Hant'], 'publisher': {'@id': person_id}},
         {'@type': 'ProfilePage', '@id': page_url + '#webpage', 'url': page_url,
          'name': c['title'], 'description': c['description'], 'inLanguage': c['lang'],
-         'isPartOf': {'@id': website_id}, 'mainEntity': {'@id': person_id}}
+         'isPartOf': {'@id': website_id}, 'mainEntity': {'@id': person_id},
+         'hasPart': {'@id': page_url + '#projects'}},
+        {'@type': 'ItemList', '@id': page_url + '#projects',
+         'name': u['work'], 'numberOfItems': len(projects),
+         'itemListElement': [
+             {'@type': 'ListItem', 'position': i + 1,
+              'item': {'@type': 'CreativeWork',
+                       '@id': page_url + '#project-' + p.get('slug', p.get('repo')),
+                       'name': p['name'], 'description': p['description'],
+                       'url': page_url + '#project-' + p.get('slug', p.get('repo'))}}
+             for i, p in enumerate(projects)]}
     ]}
     return f'''<!DOCTYPE html>
-<html lang="{c['lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#111111"><title>{E(c['title'])}</title><meta name="description" content="{E(c['description'])}">
+<html lang="{c['lang']}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="index, follow, max-image-preview:large"><meta name="author" content="{E(SITE_NAME)}"><meta name="theme-color" content="#111111"><title>{E(c['title'])}</title><meta name="description" content="{E(c['description'])}">
 <link rel="canonical" href="{ORIGIN+c['path']}"><link rel="alternate" hreflang="en" href="{ORIGIN}/"><link rel="alternate" hreflang="zh-Hant" href="{ORIGIN}/zh-tw/"><link rel="alternate" hreflang="x-default" href="{ORIGIN}/"><meta property="og:type" content="website"><meta property="og:title" content="{E(c['title'])}"><meta property="og:description" content="{E(c['description'])}"><meta property="og:url" content="{ORIGIN+c['path']}"><meta property="og:locale" content="{'en_US' if isen else 'zh_TW'}">
-<meta property="og:site_name" content="Cubelated"><meta property="og:locale:alternate" content="{'zh_TW' if isen else 'en_US'}"><meta property="og:image" content="{ORIGIN}/logo.png"><meta property="og:image:alt" content="Cubelated logo"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="{E(c['title'])}"><meta name="twitter:description" content="{E(c['description'])}"><meta name="twitter:image" content="{ORIGIN}/logo.png"><meta name="twitter:image:alt" content="Cubelated logo">
+<meta property="og:site_name" content="{E(SITE_NAME)}"><meta property="og:locale:alternate" content="{'zh_TW' if isen else 'en_US'}"><meta property="og:image" content="{ORIGIN}/logo.png"><meta property="og:image:alt" content="Cubelated logo"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="{E(c['title'])}"><meta name="twitter:description" content="{E(c['description'])}"><meta name="twitter:image" content="{ORIGIN}/logo.png"><meta name="twitter:image:alt" content="Cubelated logo">
 <link rel="icon" href="/favicon-32x32.png?v=3" type="image/png" sizes="32x32"><link rel="icon" href="/favicon-16x16.png?v=3" type="image/png" sizes="16x16"><link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml" sizes="any"><link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3" sizes="180x180"><link rel="stylesheet" href="/styles.css?v=22"><script src="/app.js?v=11" defer></script><script type="application/ld+json">{json.dumps(schema,ensure_ascii=False)}</script></head>
 <body><a class="skip" href="#main">{c['skip']}</a><header class="header"><a href="#home" class="brand" aria-label="{E(primary_name)} — {u['nav'][0]}"><img src="/logo.png" alt="" width="36" height="42"><span>{E(primary_name)}</span></a><nav class="nav" aria-label="{'Main navigation' if isen else '主要導覽'}"><span class="nav-track" aria-hidden="true"></span>{navigation}</nav><label class="language-picker" for="site-language">{icon('globe')}<span class="sr-only">{'Language' if isen else '語言'}</span><select id="site-language" data-language aria-label="{'Language' if isen else '語言'}"><option value="/" lang="en" {'selected' if isen else ''}>English</option><option value="/zh-tw/" lang="zh-Hant" {'' if isen else 'selected'}>繁體中文</option></select>{icon('chevron')}</label><noscript><a href="{langlink}">{language}</a></noscript></header>
 <main id="main"><section id="home" class="hero shell" aria-labelledby="hero-title"><div class="hero-visual"><img class="hero-banner" src="/media/banner.webp" alt="" width="1920" height="640" fetchpriority="high" decoding="async"><p class="hello">{u['hello']}</p><h1 id="hero-title">{u['hero']}</h1><div class="hero-bottom"><div><p class="intro">{u['intro']}</p><p class="location">{icon("briefcase")}<span>{E(u['location'])}</span></p></div><a class="scroll-link" href="#work"><span>{u['scroll']}</span><span class="circle">{icon("arrow-down")}</span></a></div></div>

@@ -4,13 +4,14 @@ import html
 
 ROOT = Path(__file__).parent
 ORIGIN = "https://cubelated.com"
+SITE_NAME = "Hanssen Budisantoso Wijaya"
 E = html.escape
 
 CONTENT = {'en': {'lang': 'en',
         'path': '/',
-        'title': 'Hanssen Budisantoso Wijaya | Portfolio',
-        'description': 'Explore Hanssen Budisantoso Wijaya’s portfolio: full-stack platforms, Flutter mobile apps, '
-                       'and systems integration.',
+        'title': 'Hanssen Budisantoso Wijaya | Software Engineer',
+        'description': 'Hanssen Budisantoso Wijaya (Cubelated), software engineer building Flutter apps, '
+                       'web platforms and connected systems. Explore projects and experience.',
         'skip': 'Skip to content',
         'code': 'Source code',
         'visit': 'Visit product',
@@ -97,7 +98,7 @@ CONTENT = {'en': {'lang': 'en',
                      '')]},
  'zh': {'lang': 'zh-Hant',
         'path': '/zh-tw/',
-        'title': '黃晟旺 | 作品集',
+        'title': '黃晟旺 Hanssen Budisantoso Wijaya | 軟體工程師',
         'description': '黃晟旺的個人作品集。軟體工程師，專注全端開發、Flutter 行動應用與系統整合。探索 Renewables、Selah、IFGF Planner 等專案與工作經歷。',
         'skip': '跳至主要內容',
         'code': '查看原始碼',
